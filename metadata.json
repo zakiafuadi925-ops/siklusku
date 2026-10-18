@@ -1,0 +1,6 @@
+{
+  "name": "SiklusKu - Pelacak Haid & Kesehatan Reproduksi",
+  "description": "Aplikasi pelacak siklus haid, estimasi masa subur, ovulasi, dan pencatatan gejala kesehatan reproduksi harian interaktif.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

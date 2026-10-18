@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SiklusKu - Pelacak Haid & Kesehatan Reproduksi</title>
+  <meta name="description" content="Aplikasi pelacak siklus haid, estimasi masa subur, ovulasi, dan pencatatan gejala kesehatan reproduksi harian." />
+  <meta property="og:title" content="SiklusKu - Pelacak Haid & Kesehatan Reproduksi" />
+  <meta property="og:description" content="Aplikasi pelacak siklus haid, estimasi masa subur, ovulasi, dan pencatatan gejala kesehatan reproduksi harian." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            rose: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+              800: '#9f1239',
+              900: '#881337',
+            },
+            fertile: {
+              light: '#ecfdf5',
+              border: '#a7f3d0',
+              DEFAULT: '#10b981',
+              dark: '#047857'
+            },
+            ovulation: {
+              light: '#f5f3ff',
+              border: '#ddd6fe',
+              DEFAULT: '#8b5cf6',
+              dark: '#6d28d9'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-50/70 via-white to-pink-50/50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-rose-200 selection:text-rose-900 pb-20 md:pb-8">
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-rose-100/80 shadow-xs">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-400 flex items-center justify-center text-white shadow-md shadow-rose-200">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
+            SiklusKu
+            <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-rose-100 text-rose-700">Pelacak Haid</span>
+          </h1>
+          <p class="text-xs text-slate-500">Kesehatan Reproduksi & Siklus Wanita</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="btn-quick-log" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition shadow-xs cursor-pointer">
+          <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Catat Gejala Hari Ini
+        </button>
+
+        <button id="btn-open-settings" title="Pengaturan Siklus" class="p-2 rounded-xl text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition border border-transparent hover:border-rose-100 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
+
+    <!-- DESKTOP / TABLET TABS NAVIGATION -->
+    <nav class="flex items-center gap-1 p-1 bg-white border border-rose-100 rounded-2xl shadow-xs mb-6 max-w-md mx-auto sm:max-w-none justify-center">
+      <button data-tab="dashboard" class="tab-btn active-tab flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span>Ringkasan</span>
+      </button>
+      <button data-tab="calendar" class="tab-btn flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 transition cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <span>Kalender</span>
+      </button>
+      <button data-tab="log" class="tab-btn flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 transition cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+        <span>Catatan Gejala</span>
+      </button>
+      <button data-tab="education" class="tab-btn flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 transition cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <span>Edukasi</span>
+      </button>
+    </nav>
+
+    <!-- ================= TAB CONTENT 1: DASHBOARD ================= -->
+    <section id="tab-dashboard" class="tab-section space-y-6">
+      
+      <!-- HERO STATUS CARD: Circular Cycle Visual & Countdown -->
+      <div class="relative overflow-hidden bg-gradient-to-b from-white to-rose-50/40 rounded-3xl p-6 sm:p-8 border border-rose-100 shadow-sm">
+        <div class="absolute -top-12 -right-12 w-48 h-48 bg-rose-200/30 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-100/40 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="flex flex-col md:flex-row items-center gap-8 justify-between relative z-10">
+          
+          <!-- Interactive Cycle Progress Ring -->
+          <div class="relative flex items-center justify-center flex-shrink-0">
+            <svg class="w-56 h-56 transform -rotate-90" viewBox="0 0 160 160">
+              <!-- Background Circle -->
+              <circle cx="80" cy="80" r="70" stroke="#f1f5f9" stroke-width="12" fill="transparent" />
+              <!-- Progress Circle -->
+              <circle id="cycle-progress-circle" cx="80" cy="80" r="70" stroke="#f43f5e" stroke-width="12" fill="transparent" 
+                      stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="100" class="transition-all duration-1000 ease-out" />
+            </svg>
+
+            <!-- Center Content in Ring -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+              <span id="cycle-day-badge" class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-100/90 px-2.5 py-0.5 rounded-full mb-1">
+                Hari ke-1
+              </span>
+              <span id="countdown-number" class="text-4xl font-extrabold tracking-tight text-slate-900 leading-none">
+                --
+              </span>
+              <span id="countdown-label" class="text-xs font-medium text-slate-500 mt-1 max-w-[120px]">
+                Hari Menuju Haid
+              </span>
+            </div>
+          </div>
+
+          <!-- Status & Phase Details -->
+          <div class="flex-1 text-center md:text-left space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" id="phase-pill">
+              <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+              <span id="phase-title">Fase Menstruasi</span>
+            </div>
+
+            <h2 id="hero-greeting" class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              Tubuhmu sedang dalam fase istirahat.
+            </h2>
+            <p id="phase-description" class="text-sm text-slate-600 leading-relaxed max-w-xl">
+              Tingkat estrogen dan progesteron berada pada titik terendah. Cukupi cairan tubuh, istirahat cukup, dan konsumsi makanan kaya zat besi.
+            </p>
+
+            <!-- Key Cycle Stats Pills -->
+            <div class="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 text-left">
+              <div class="bg-white/80 p-3 rounded-2xl border border-rose-100/70 shadow-2xs">
+                <span class="text-[11px] font-medium text-slate-400 block">Prediksi Haid Baru</span>
+                <span id="stat-next-period" class="text-sm font-bold text-slate-800">--</span>
+              </div>
+              <div class="bg-white/80 p-3 rounded-2xl border border-emerald-100/70 shadow-2xs">
+                <span class="text-[11px] font-medium text-slate-400 block">Perkiraan Ovulasi</span>
+                <span id="stat-ovulation" class="text-sm font-bold text-emerald-700">--</span>
+              </div>
+              <div class="col-span-2 sm:col-span-1 bg-white/80 p-3 rounded-2xl border border-rose-100/70 shadow-2xs">
+                <span class="text-[11px] font-medium text-slate-400 block">Jendela Subur</span>
+                <span id="stat-fertile-window" class="text-xs font-bold text-slate-700">--</span>
+              </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="pt-3 flex flex-wrap gap-2 justify-center md:justify-start">
+              <button id="btn-period-today" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 transition shadow-sm shadow-rose-200 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Haid Mulai Hari Ini
+              </button>
+              <button id="btn-open-log-modal" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 transition shadow-2xs cursor-pointer">
+                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Catat Gejala & Mood
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSIGHT & TIPS CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Card 1: Peluang Kehamilan / Fertilitas Hari Ini -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs flex items-start gap-4">
+          <div id="fertility-icon-container" class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900">Peluang Kehamilan Hari Ini</h3>
+              <span id="fertility-chance-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Rendah</span>
+            </div>
+            <p id="fertility-chance-desc" class="text-xs text-slate-500 leading-relaxed">
+              Kamu sedang berada di luar jendela masa subur. Kemungkinan konsepsi alami tergolong rendah.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 2: Rekomendasi Nutrisi & Kebugaran -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900">Saran Tubuh & Nutrisi</h3>
+              <span class="text-xs font-medium text-rose-600">Fase Khusus</span>
+            </div>
+            <p id="nutrition-tip" class="text-xs text-slate-500 leading-relaxed">
+              Konsumsi air hangat, sup jahe, dan sayuran berdaun hijau gelap. Hindari kafein berlebih jika kram melanda.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MINI CALENDAR PREVIEW -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Perjalanan Siklus Bulan Ini</h3>
+            <p class="text-xs text-slate-500">Klik tanggal untuk melihat status atau mencatat gejala</p>
+          </div>
+          <button id="btn-go-calendar" class="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer">
+            Buka Kalender Lengkap
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 7-day mini row snippet -->
+        <div id="mini-calendar-strip" class="grid grid-cols-7 gap-1.5 sm:gap-2 text-center pt-2">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Mini Legend -->
+        <div class="flex flex-wrap items-center justify-center gap-4 pt-2 text-[11px] text-slate-600">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+            <span>Haid</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-rose-200 border border-rose-300"></span>
+            <span>Prediksi Haid</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+            <span>Masa Subur</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-purple-500 ring-2 ring-purple-200"></span>
+            <span>Puncak Ovulasi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT DAILY LOGS SUMMARY -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Catatan Gejala Terbaru</h3>
+            <p class="text-xs text-slate-500">Pantau fluktuasi suasana hati dan gejala fisikmu</p>
+          </div>
+          <button id="btn-view-all-logs" class="text-xs font-semibold text-rose-600 hover:text-rose-700 cursor-pointer">
+            Kelola Semua
+          </button>
+        </div>
+
+        <div id="dashboard-recent-logs" class="space-y-2.5">
+          <!-- Populated by JS: empty or items -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB CONTENT 2: KALENDER INTERAKTIF ================= -->
+    <section id="tab-calendar" class="tab-section hidden space-y-6">
+      
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs space-y-6">
+        
+        <!-- Calendar Header (Month Selector) -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 id="calendar-month-year" class="text-xl font-extrabold text-slate-900">
+              Oktober 2026
+            </h2>
+            <p class="text-xs text-slate-500">Pilih tanggal untuk melihat detail fase & mencatat gejala</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-cal-prev" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 active:scale-95 transition cursor-pointer" title="Bulan Sebelumnya">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button id="btn-cal-today" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition cursor-pointer">
+              Hari Ini
+            </button>
+            <button id="btn-cal-next" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 active:scale-95 transition cursor-pointer" title="Bulan Berikutnya">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Day of Week Header -->
+        <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs text-slate-400 py-1 border-b border-slate-100">
+          <div>MIN</div>
+          <div>SEN</div>
+          <div>SEL</div>
+          <div>RAB</div>
+          <div>KAM</div>
+          <div>JUM</div>
+          <div>SAB</div>
+        </div>
+
+        <!-- Calendar Days Grid -->
+        <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+          <!-- Generated dynamically by JS -->
+        </div>
+
+        <!-- Full Legend -->
+        <div class="p-4 rounded-2xl bg-slate-50/80 border border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-lg bg-rose-500 shadow-2xs"></span>
+            <span class="font-medium">Haid Terkonfirmasi</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-lg bg-rose-100 border border-rose-300"></span>
+            <span class="font-medium">Prediksi Haid Datang</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-lg bg-emerald-100 border border-emerald-300"></span>
+            <span class="font-medium">Masa Subur</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-lg bg-purple-500"></span>
+            <span class="font-medium">Puncak Ovulasi</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-slate-800"></span>
+            <span class="font-medium">Ada Catatan Gejala</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SELECTED DATE DETAIL PANEL -->
+      <div id="selected-date-panel" class="bg-white rounded-3xl p-6 border border-rose-100 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <span class="text-xs font-semibold text-rose-600 uppercase tracking-wider" id="selected-date-subtitle">Detail Tanggal</span>
+            <h3 id="selected-date-title" class="text-lg font-bold text-slate-900">Minggu, 18 Oktober 2026</h3>
+          </div>
+          <button id="btn-log-for-selected-date" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span id="selected-date-log-btn-text">Catat Gejala Tanggal Ini</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="selected-date-details">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB CONTENT 3: CATATAN GEJALA ================= -->
+    <section id="tab-log" class="tab-section hidden space-y-6">
+      
+      <!-- Log Form Card -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xs space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900">Catatan Gejala Harian</h2>
+            <p class="text-xs text-slate-500">Rekam sinyal tubuh untuk mengenali pola siklusmu</p>
+          </div>
+          <div>
+            <input type="date" id="input-log-date" class="px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 focus:outline-rose-500 bg-slate-50 cursor-pointer">
+          </div>
+        </div>
+
+        <form id="daily-log-form" class="space-y-6">
+          
+          <!-- 1. Pendarahan / Aliran Haid -->
+          <div class="space-y-2.5">
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+              Aliran Pendarahan
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="flow-options">
+              <button type="button" data-flow="none" class="flow-pill active-pill p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-rose-300 transition text-center cursor-pointer">
+                Tidak Ada
+              </button>
+              <button type="button" data-flow="spotting" class="flow-pill p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-rose-300 transition text-center cursor-pointer">
+                Bercak (Spotting)
+              </button>
+              <button type="button" data-flow="light" class="flow-pill p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-rose-300 transition text-center cursor-pointer">
+                Ringan
+              </button>
+              <button type="button" data-flow="medium" class="flow-pill p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-rose-300 transition text-center cursor-pointer">
+                Sedang
+              </button>
+              <button type="button" data-flow="heavy" class="flow-pill p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-rose-300 transition text-center cursor-pointer">
+                Deras
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Nyeri / Kram Perut -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                Tingkat Kram / Nyeri
+              </label>
+              <span id="pain-level-label" class="text-xs font-bold text-rose-600">0 - Bebas Nyeri</span>
+            </div>
+            <div class="grid grid-cols-5 gap-2" id="pain-options">
+              <button type="button" data-pain="0" class="pain-pill active-pill p-2 rounded-xl border border-slate-200 text-center text-xs font-semibold hover:border-rose-300 transition cursor-pointer">
+                <span class="text-lg block">😊</span> 0
+              </button>
+              <button type="button" data-pain="1" class="pain-pill p-2 rounded-xl border border-slate-200 text-center text-xs font-semibold hover:border-rose-300 transition cursor-pointer">
+                <span class="text-lg block">🙂</span> 1
+              </button>
+              <button type="button" data-pain="2" class="pain-pill p-2 rounded-xl border border-slate-200 text-center text-xs font-semibold hover:border-rose-300 transition cursor-pointer">
+                <span class="text-lg block">😐</span> 2
+              </button>
+              <button type="button" data-pain="3" class="pain-pill p-2 rounded-xl border border-slate-200 text-center text-xs font-semibold hover:border-rose-300 transition cursor-pointer">
+                <span class="text-lg block">😣</span> 3
+              </button>
+              <button type="button" data-pain="4" class="pain-pill p-2 rounded-xl border border-slate-200 text-center text-xs font-semibold hover:border-rose-300 transition cursor-pointer">
+                <span class="text-lg block">😫</span> 4
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Suasana Hati / Mood -->
+          <div class="space-y-2.5">
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+              Suasana Hati (Mood)
+            </label>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="mood-options">
+              <button type="button" data-mood="happy" class="mood-pill p-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:border-rose-300 transition flex flex-col items-center gap-1 cursor-pointer">
+                <span class="text-xl">😊</span> Senang
+              </button>
+              <button type="button" data-mood="calm" class="mood-pill active-pill p-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:border-rose-300 transition flex flex-col items-center gap-1 cursor-pointer">
+                <span class="text-xl">😌</span> Tenang
+              </button>
+              <button type="button" data-mood="sensitive" class="mood-pill p-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:border-rose-300 transition flex flex-col items-center gap-1 cursor-pointer">
+                <span class="text-xl">🥺</span> Sensitif
+              </button>
+              <button type="button" data-mood="anxious" class="mood-pill p-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:border-rose-300 transition flex flex-col items-center gap-1 cursor-pointer">
+                <span class="text-xl">😰</span> Cemas
+              </button>
+              <button type="button" data-mood="tired" class="mood-pill p-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:border-rose-300 transition flex flex-col items-center gap-1 cursor-pointer">
+                <span class="text-xl">🥱</span> Lelah
+              </button>
+              <button type="button" data-mood="irritated" class="mood-pill p-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:border-rose-300 transition flex flex-col items-center gap-1 cursor-pointer">
+                <span class="text-xl">😠</span> Mudah Kesal
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Gejala Fisik Lainnya (Multi-select) -->
+          <div class="space-y-2.5">
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Gejala Tubuh Lainnya
+            </label>
+            <div class="flex flex-wrap gap-2" id="symptoms-tags">
+              <button type="button" data-symptom="bloated" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Perut Kembung</button>
+              <button type="button" data-symptom="tender_breasts" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Payudara Nyeri</button>
+              <button type="button" data-symptom="acne" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Jerawat</button>
+              <button type="button" data-symptom="headache" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Sakit Kepala</button>
+              <button type="button" data-symptom="backache" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Nyeri Punggung</button>
+              <button type="button" data-symptom="craving" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Ngidam Manis/Asin</button>
+              <button type="button" data-symptom="insomnia" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Sulit Tidur</button>
+              <button type="button" data-symptom="high_energy" class="symptom-tag px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:border-rose-300 transition cursor-pointer">Energi Tinggi</button>
+            </div>
+          </div>
+
+          <!-- 5. Catatan Bebas / Jurnal -->
+          <div class="space-y-2">
+            <label for="log-note" class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Catatan Bebas (Opsional)
+            </label>
+            <textarea id="log-note" rows="3" placeholder="Tuliskan pengalaman fisik, aktivitas, konsumsi vitamin, atau hal penting hari ini..." class="w-full p-3 rounded-2xl border border-slate-200 text-xs sm:text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-100 outline-none transition resize-none"></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-2">
+            <button type="button" id="btn-delete-log" class="text-xs font-semibold text-rose-500 hover:text-rose-700 hidden cursor-pointer">
+              Hapus Catatan Ini
+            </button>
+            <div class="flex items-center gap-3 ml-auto">
+              <button type="reset" id="btn-reset-form" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 transition cursor-pointer">
+                Reset
+              </button>
+              <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 transition shadow-sm shadow-rose-200 cursor-pointer">
+                Simpan Catatan
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- History of Logs -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs space-y-4">
+        <h3 class="text-base font-bold text-slate-900">Riwayat Catatan Tersimpan</h3>
+        <div id="full-log-history" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB CONTENT 4: EDUKASI & KESEHATAN ================= -->
+    <section id="tab-education" class="tab-section hidden space-y-6">
+      <div class="bg-gradient-to-r from-rose-500 to-pink-500 rounded-3xl p-6 sm:p-8 text-white shadow-md shadow-rose-200">
+        <h2 class="text-2xl font-black mb-2">Panduan 4 Fase Siklus Menstruasi</h2>
+        <p class="text-rose-100 text-xs sm:text-sm max-w-xl leading-relaxed">
+          Siklus haid bukan sekadar tentang pendarahan, melainkan orkestrasi hormon yang memengaruhi energi, suasana hati, metabolisme, dan kesuburan sepanjang bulan.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Fase 1 -->
+        <div class="bg-white p-6 rounded-3xl border border-rose-100 shadow-xs space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 font-extrabold flex items-center justify-center">1</div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Fase Menstruasi (Hari 1-5)</h3>
+              <p class="text-xs text-rose-600 font-medium">Pelepasan dinding rahim</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Lapisan rahim meluruh karena kadar estrogen dan progesteron menurun. Tubuh terasa lebih cepat lelah dan rentan kram.
+          </p>
+          <div class="bg-rose-50/70 p-3 rounded-2xl text-[11px] text-rose-900 space-y-1">
+            <strong>Tips:</strong> Istirahat cukup, kompres hangat di perut bawah, konsumsi makanan kaya zat besi (bayam, daging merah, lentil) dan vitamin C.
+          </div>
+        </div>
+
+        <!-- Fase 2 -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 font-extrabold flex items-center justify-center">2</div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Fase Folikular (Hari 6-13)</h3>
+              <p class="text-xs text-pink-600 font-medium">Pematangan sel telur & energi meningkat</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Hormon FSH merangsang folikel indung telur, dan estrogen mulai melonjak. Kulit tampak lebih bersinar, mood ceria, dan daya tahan tubuh prima.
+          </p>
+          <div class="bg-pink-50/70 p-3 rounded-2xl text-[11px] text-pink-900 space-y-1">
+            <strong>Tips:</strong> Waktu terbaik untuk memulai proyek baru, latihan kardio intensif, serta makanan bergizi seimbang dengan lemak sehat.
+          </div>
+        </div>
+
+        <!-- Fase 3 -->
+        <div class="bg-white p-6 rounded-3xl border border-emerald-100 shadow-xs space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 font-extrabold flex items-center justify-center">3</div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Fase Ovulasi (Hari ~14)</h3>
+              <p class="text-xs text-emerald-600 font-medium">Puncak masa subur & pelepasan sel telur</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Lonjakan hormon LH memicu pelepasan sel telur matang. Jendela masa subur meliputi 5 hari sebelum ovulasi hingga 1 hari setelahnya karena sperma dapat bertahan hidup hingga 5 hari.
+          </p>
+          <div class="bg-emerald-50/70 p-3 rounded-2xl text-[11px] text-emerald-900 space-y-1">
+            <strong>Tips:</strong> Jika sedang merencanakan kehamilan, inilah waktu optimal berhubungan. Lendir serviks cenderung bening dan elastis seperti putih telur mentah.
+          </div>
+        </div>
+
+        <!-- Fase 4 -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 font-extrabold flex items-center justify-center">4</div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Fase Luteal (Hari 15-28)</h3>
+              <p class="text-xs text-purple-600 font-medium">Dominasi progesteron & masa PMS</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Korpus luteum memproduksi progesteron. Jika tidak terjadi pembuahan, kadar hormon akan turun tajam dan dapat memicu gejala PMS (premenstrual syndrome) seperti kembung, nyeri payudara, dan sensitivitas emosi.
+          </p>
+          <div class="bg-purple-50/70 p-3 rounded-2xl text-[11px] text-purple-900 space-y-1">
+            <strong>Tips:</strong> Batasi garam dan kafein, konsumsi magnesium (dark chocolate, pisang), serta lakukan olahraga ringan seperti yoga atau jalan santai.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-xs space-y-4">
+        <h3 class="text-base font-bold text-slate-900">Pertanyaan yang Sering Diajukan (FAQ)</h3>
+        <div class="space-y-3 text-xs sm:text-sm text-slate-600">
+          <details class="p-3 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer">
+            <summary class="font-bold text-slate-800">Bagaimana rumus estimasi siklus dihitung?</summary>
+            <p class="mt-2 text-slate-600 leading-relaxed text-xs">
+              Estimasi haid berikutnya dihitung dengan menambahkan Panjang Siklus rata-rata ke tanggal Hari Pertama Haid Terakhir (LMP). Hari ovulasi diperkirakan 14 hari sebelum tanggal perkiraan haid berikutnya (sesuai panjang fase luteal normal), dan masa subur adalah 5 hari sebelum ovulasi hingga 1 hari setelah ovulasi.
+            </p>
+          </details>
+
+          <details class="p-3 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer">
+            <summary class="font-bold text-slate-800">Berapa panjang siklus haid yang normal?</summary>
+            <p class="mt-2 text-slate-600 leading-relaxed text-xs">
+              Siklus haid normal berkisar antara 21 hingga 35 hari, dengan durasi pendarahan rata-rata 2 hingga 7 hari. Siklus dapat berfluktuasi karena stres, pola tidur, diet, atau perubahan hormon.
+            </p>
+          </details>
+
+          <details class="p-3 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer">
+            <summary class="font-bold text-slate-800">Kapan harus berkonsultasi ke dokter spesialis kandungan (Obgyn)?</summary>
+            <p class="mt-2 text-slate-600 leading-relaxed text-xs">
+              Segera periksakan diri jika: haid tidak datang lebih dari 90 hari (dan tidak hamil), pendarahan berlangsung lebih dari 8 hari, mengalami nyeri panggul yang sangat hebat hingga melumpuhkan aktivitas harian, atau pendarahan di antara dua siklus.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= BOTTOM NAVIGATION BAR (Mobile First) ================= -->
+  <footer class="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-rose-100 shadow-lg px-2 py-1">
+    <div class="grid grid-cols-4 text-center">
+      <button data-tab="dashboard" class="mobile-nav-btn active-tab flex flex-col items-center justify-center py-2 text-rose-600 cursor-pointer">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="text-[10px] font-semibold">Ringkasan</span>
+      </button>
+
+      <button data-tab="calendar" class="mobile-nav-btn flex flex-col items-center justify-center py-2 text-slate-400 hover:text-slate-600 cursor-pointer">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <span class="text-[10px] font-semibold">Kalender</span>
+      </button>
+
+      <button data-tab="log" class="mobile-nav-btn flex flex-col items-center justify-center py-2 text-slate-400 hover:text-slate-600 cursor-pointer">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+        <span class="text-[10px] font-semibold">Catatan</span>
+      </button>
+
+      <button data-tab="education" class="mobile-nav-btn flex flex-col items-center justify-center py-2 text-slate-400 hover:text-slate-600 cursor-pointer">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <span class="text-[10px] font-semibold">Edukasi</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL: PENGATURAN SIKLUS (Settings) ================= -->
+  <div id="modal-settings" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-rose-100 space-y-6 transform transition-all">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Pengaturan Siklus</h3>
+        </div>
+        <button id="btn-close-settings" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form id="settings-form" class="space-y-4">
+        <!-- LMP Input -->
+        <div class="space-y-1.5">
+          <label for="input-lmp-date" class="text-xs font-bold text-slate-700">
+            Tanggal Hari Pertama Haid Terakhir (LMP)
+          </label>
+          <input type="date" id="input-lmp-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-100 outline-none">
+          <p class="text-[11px] text-slate-400">Pilih hari pertama darah haid mulai keluar.</p>
+        </div>
+
+        <!-- Period Duration Slider / Number -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="input-period-duration" class="text-xs font-bold text-slate-700">
+              Durasi Haid Rata-rata
+            </label>
+            <span id="display-period-duration" class="text-xs font-extrabold text-rose-600">5 Hari</span>
+          </div>
+          <input type="range" id="input-period-duration" min="2" max="10" step="1" value="5" class="w-full accent-rose-500 cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400">
+            <span>2 hari</span>
+            <span>Default: 5 hari</span>
+            <span>10 hari</span>
+          </div>
+        </div>
+
+        <!-- Cycle Length Slider / Number -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="input-cycle-length" class="text-xs font-bold text-slate-700">
+              Panjang Siklus Rata-rata
+            </label>
+            <span id="display-cycle-length" class="text-xs font-extrabold text-rose-600">28 Hari</span>
+          </div>
+          <input type="range" id="input-cycle-length" min="21" max="45" step="1" value="28" class="w-full accent-rose-500 cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400">
+            <span>21 hari</span>
+            <span>Normal: 28 hari</span>
+            <span>45 hari</span>
+          </div>
+        </div>
+
+        <!-- Error Alert Container -->
+        <div id="settings-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700"></div>
+
+        <!-- Footer / Action Buttons -->
+        <div class="pt-3 flex items-center justify-between">
+          <button type="button" id="btn-load-demo" class="text-xs font-medium text-slate-500 hover:text-slate-800 underline cursor-pointer">
+            Muat Data Demo
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-cancel-settings" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">
+              Batal
+            </button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm cursor-pointer">
+              Simpan Perubahan
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Danger Zone / Reset -->
+      <div class="pt-2 border-t border-slate-100 text-center">
+        <button type="button" id="btn-reset-all-data" class="text-[11px] font-medium text-rose-500 hover:text-rose-700 cursor-pointer">
+          Reset Seluruh Data & Log ke Awal
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div id="toast" class="fixed bottom-20 sm:bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span id="toast-message">Perubahan berhasil disimpan!</span>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /**
+     * SIKLUSKU - CORE ARCHITECTURE & LOGIC
+     * Modular, Pure JavaScript, LocalStorage Persistence.
+     */
+
+    // --- 1. STATE & STORAGE MANAGER ---
+    const STORAGE_KEYS = {
+      SETTINGS: 'siklusku_settings_v1',
+      LOGS: 'siklusku_daily_logs_v1'
+    };
+
+    // Default configuration (as required: 5-day period, 28-day cycle)
+    const DEFAULT_SETTINGS = {
+      lmpDate: '', // Will be set to ~12 days ago for initial fresh demo
+      periodDuration: 5, // Range 2 - 10
+      cycleLength: 28   // Range 21 - 35 (or up to 45)
+    };
+
+    class StorageManager {
+      static getSettings() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+          if (!raw) {
+            // Seed a realistic default: LMP 12 days before today
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() - 12);
+            const initial = {
+              ...DEFAULT_SETTINGS,
+              lmpDate: defaultDate.toISOString().split('T')[0]
+            };
+            this.saveSettings(initial);
+            return initial;
+          }
+          return JSON.parse(raw);
+        } catch (e) {
+          console.error("Failed to read settings from storage", e);
+          return DEFAULT_SETTINGS;
+        }
+      }
+
+      static saveSettings(settings) {
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+      }
+
+      static getLogs() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEYS.LOGS);
+          return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+          console.error("Failed to read logs from storage", e);
+          return {};
+        }
+      }
+
+      static saveLog(dateStr, logData) {
+        const logs = this.getLogs();
+        logs[dateStr] = {
+          ...logData,
+          updatedAt: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
+        return logs;
+      }
+
+      static deleteLog(dateStr) {
+        const logs = this.getLogs();
+        if (logs[dateStr]) {
+          delete logs[dateStr];
+          localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
+        }
+        return logs;
+      }
+
+      static resetAll() {
+        localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+        localStorage.removeItem(STORAGE_KEYS.LOGS);
+      }
+    }
+
+    // --- 2. CYCLE CALCULATOR (DATE & MATH ENGINE) ---
+    class CycleCalculator {
+      /**
+       * Menghitung tanggal-tanggal penting siklus menstruasi berdasarkan:
+       * 1. LMP (Last Menstrual Period)
+       * 2. Panjang Siklus (Cycle Length)
+       * 3. Durasi Haid (Period Duration)
+       */
+      static calculate(settings) {
+        const lmp = this.parseDate(settings.lmpDate);
+        const cycleLength = parseInt(settings.cycleLength, 10) || 28;
+        const periodDuration = parseInt(settings.periodDuration, 10) || 5;
+
+        // 1. Estimasi tanggal haid berikutnya = LMP + Panjang Siklus
+        const nextPeriod = new Date(lmp);
+        nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+
+        // 2. Estimasi Hari Ovulasi = Estimasi Haid Berikutnya - 14 hari
+        // (Fase luteal umumnya konstan sekitar 14 hari sebelum haid berikutnya)
+        const ovulation = new Date(nextPeriod);
+        ovulation.setDate(ovulation.getDate() - 14);
+
+        // 3. Jendela Masa Subur (Fertile Window) = Hari Ovulasi - 5 hari s/d Hari Ovulasi + 1 hari
+        // (Sperma dapat bertahan hingga 5 hari di saluran reproduksi, sel telur bertahan 12-24 jam)
+        const fertileStart = new Date(ovulation);
+        fertileStart.setDate(fertileStart.getDate() - 5);
+
+        const fertileEnd = new Date(ovulation);
+        fertileEnd.setDate(fertileEnd.getDate() + 1);
+
+        // Durasi haid LMP saat ini
+        const currentPeriodEnd = new Date(lmp);
+        currentPeriodEnd.setDate(currentPeriodEnd.getDate() + (periodDuration - 1));
+
+        return {
+          lmp,
+          nextPeriod,
+          ovulation,
+          fertileStart,
+          fertileEnd,
+          periodDuration,
+          cycleLength,
+          currentPeriodEnd
+        };
+      }
+
+      /**
+       * Evaluasi status dan fase pada tanggal tertentu (misalnya Hari Ini)
+       */
+      static evaluateDate(targetDate, cycleData) {
+        const target = this.stripTime(new Date(targetDate));
+        const lmp = this.stripTime(new Date(cycleData.lmp));
+        const nextPeriod = this.stripTime(new Date(cycleData.nextPeriod));
+        const ovulation = this.stripTime(new Date(cycleData.ovulation));
+        const fertileStart = this.stripTime(new Date(cycleData.fertileStart));
+        const fertileEnd = this.stripTime(new Date(cycleData.fertileEnd));
+        const periodDuration = cycleData.periodDuration;
+        const cycleLength = cycleData.cycleLength;
+
+        const diffDaysFromLMP = Math.floor((target - lmp) / (1000 * 60 * 60 * 24));
+        const diffDaysToNext = Math.ceil((nextPeriod - target) / (1000 * 60 * 60 * 24));
+
+        // Hari ke-X dalam siklus (1-indexed)
+        let cycleDay = diffDaysFromLMP + 1;
+        let isOverdue = false;
+
+        if (cycleDay > cycleLength) {
+          isOverdue = true;
+        }
+
+        // Tentukan jenis fase
+        let phase = 'follicular';
+        let phaseName = 'Fase Folikular';
+        let phaseDescription = 'Estrogen mulai meningkat, folikel indung telur berkembang. Energi dan fokus biasanya mulai prima.';
+        let pregnancyChance = 'Rendah';
+
+        // 1. Cek apakah masuk fase menstruasi aktif
+        if (target >= lmp && target <= this.addDays(lmp, periodDuration - 1)) {
+          phase = 'menstruation';
+          phaseName = 'Fase Menstruasi';
+          phaseDescription = 'Dinding rahim sedang meluruh. Prioritaskan istirahat, hidrasi air hangat, dan kompres lembut bila kram.';
+          pregnancyChance = 'Sangat Rendah';
+        }
+        // 2. Cek apakah puncak ovulasi
+        else if (target.getTime() === ovulation.getTime()) {
+          phase = 'ovulation';
+          phaseName = 'Puncak Ovulasi';
+          phaseDescription = 'Sel telur matang dilepaskan dari indung telur. Peluang pembuahan alami berada pada tingkat tertinggi!';
+          pregnancyChance = 'Sangat Tinggi (Puncak)';
+        }
+        // 3. Cek apakah berada dalam jendela masa subur
+        else if (target >= fertileStart && target <= fertileEnd) {
+          phase = 'fertile';
+          phaseName = 'Masa Subur';
+          phaseDescription = 'Kadar hormon esterogen tinggi dan serviks memproduksi cairan ramah sperma. Waktu optimal bila berikhtiar hamil.';
+          pregnancyChance = 'Tinggi';
+        }
+        // 4. Cek apakah fase luteal (setelah masa subur s/d sebelum haid berikutnya)
+        else if (target > fertileEnd && target < nextPeriod) {
+          phase = 'luteal';
+          phaseName = 'Fase Luteal';
+          phaseDescription = 'Progesteron mendominasi tubuh. Kamu mungkin mengalami gejala pra-haid (PMS), kembung, atau perubahan mood.';
+          pregnancyChance = 'Rendah';
+        }
+        // 5. Cek jika sudah melewati tanggal prediksi (telat haid)
+        else if (target >= nextPeriod) {
+          phase = 'overdue';
+          phaseName = 'Siklus Lewat Waktu';
+          phaseDescription = 'Siklus sudah melewati panjang normal. Bila kamu aktif secara seksual, pertimbangkan tes kehamilan bila telat > 7 hari.';
+          pregnancyChance = 'Bervariasi';
+        }
+
+        return {
+          cycleDay,
+          diffDaysToNext,
+          phase,
+          phaseName,
+          phaseDescription,
+          pregnancyChance,
+          isOverdue,
+          isOvulationDay: target.getTime() === ovulation.getTime(),
+          isFertile: target >= fertileStart && target <= fertileEnd,
+          isPeriod: target >= lmp && target <= this.addDays(lmp, periodDuration - 1),
+          isPredictedNextPeriod: target >= nextPeriod && target <= this.addDays(nextPeriod, periodDuration - 1)
+        };
+      }
+
+      // Helper date functions
+      static parseDate(dateStr) {
+        if (!dateStr) return new Date();
+        const parts = dateStr.split('-');
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      }
+
+      static formatDate(date) {
+        const d = new Date(date);
+        const month = '' + (d.getMonth() + 1);
+        const day = '' + d.getDate();
+        const year = d.getFullYear();
+        return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
+      }
+
+      static formatIndoDate(date, withDayName = true) {
+        const d = new Date(date);
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = [
+          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+        const dayName = days[d.getDay()];
+        const dayNum = d.getDate();
+        const monthName = months[d.getMonth()];
+        const year = d.getFullYear();
+
+        return withDayName ? `${dayName}, ${dayNum} ${monthName} ${year}` : `${dayNum} ${monthName} ${year}`;
+      }
+
+      static stripTime(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+
+      static addDays(date, days) {
+        const res = new Date(date);
+        res.setDate(res.getDate() + days);
+        return res;
+      }
+    }
+
+    // --- 3. UI CONTROLLER ---
+    class AppUI {
+      constructor() {
+        this.settings = StorageManager.getSettings();
+        this.logs = StorageManager.getLogs();
+        this.cycleData = CycleCalculator.calculate(this.settings);
+        
+        // Calendar view state
+        this.currentViewDate = new Date();
+        this.selectedDate = CycleCalculator.formatDate(new Date());
+
+        // Log form active values
+        this.activeFlow = 'none';
+        this.activePain = '0';
+        this.activeMood = 'calm';
+        this.activeSymptoms = new Set();
+
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.renderAll();
+      }
+
+      renderAll() {
+        this.cycleData = CycleCalculator.calculate(this.settings);
+        this.renderDashboard();
+        this.renderCalendar();
+        this.renderSelectedDateDetail();
+        this.renderRecentLogs();
+        this.renderLogHistory();
+        this.updateSettingsFormValues();
+      }
+
+      bindEvents() {
+        // Tab Navigation
+        const tabs = document.querySelectorAll('.tab-btn, .mobile-nav-btn');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', (e) => {
+            const targetTab = tab.getAttribute('data-tab');
+            this.switchTab(targetTab);
+          });
+        });
+
+        // Quick button to go to calendar or log
+        document.getElementById('btn-go-calendar')?.addEventListener('click', () => {
+          this.switchTab('calendar');
+        });
+        document.getElementById('btn-quick-log')?.addEventListener('click', () => {
+          this.openLogFormForDate(CycleCalculator.formatDate(new Date()));
+        });
+        document.getElementById('btn-open-log-modal')?.addEventListener('click', () => {
+          this.openLogFormForDate(CycleCalculator.formatDate(new Date()));
+        });
+        document.getElementById('btn-view-all-logs')?.addEventListener('click', () => {
+          this.switchTab('log');
+        });
+
+        // Quick Period Started Today Button
+        document.getElementById('btn-period-today')?.addEventListener('click', () => {
+          if (confirm("Konfirmasi: Apakah haid baru Anda dimulai hari ini?")) {
+            const todayStr = CycleCalculator.formatDate(new Date());
+            this.settings.lmpDate = todayStr;
+            StorageManager.saveSettings(this.settings);
+            
+            // Also log light/medium flow for today
+            this.logs = StorageManager.saveLog(todayStr, {
+              flow: 'medium',
+              pain: '1',
+              mood: 'calm',
+              symptoms: ['bloated'],
+              note: 'Haid hari pertama dimulai.'
+            });
+
+            this.showToast("Tanggal Haid Terakhir berhasil diperbarui ke hari ini!");
+            this.renderAll();
+          }
+        });
+
+        // Settings Modal
+        const modal = document.getElementById('modal-settings');
+        document.getElementById('btn-open-settings')?.addEventListener('click', () => {
+          this.updateSettingsFormValues();
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        });
+
+        const closeModal = () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          document.getElementById('settings-error').classList.add('hidden');
+        };
+
+        document.getElementById('btn-close-settings')?.addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-settings')?.addEventListener('click', closeModal);
+
+        // Sliders live label update
+        const inputPeriod = document.getElementById('input-period-duration');
+        const inputCycle = document.getElementById('input-cycle-length');
+        inputPeriod?.addEventListener('input', (e) => {
+          document.getElementById('display-period-duration').textContent = `${e.target.value} Hari`;
+        });
+        inputCycle?.addEventListener('input', (e) => {
+          document.getElementById('display-cycle-length').textContent = `${e.target.value} Hari`;
+        });
+
+        // Settings form submission
+        document.getElementById('settings-form')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const lmpDate = document.getElementById('input-lmp-date').value;
+          const periodDuration = parseInt(document.getElementById('input-period-duration').value, 10);
+          const cycleLength = parseInt(document.getElementById('input-cycle-length').value, 10);
+
+          // Validation
+          const errorContainer = document.getElementById('settings-error');
+          if (!lmpDate) {
+            errorContainer.textContent = "Silakan masukkan tanggal haid terakhir yang valid.";
+            errorContainer.classList.remove('hidden');
+            return;
+          }
+
+          const selectedLMP = new Date(lmpDate);
+          const today = new Date();
+          // Edge case: LMP cannot be far in the future
+          if (selectedLMP > today) {
+            errorContainer.textContent = "Tanggal LMP tidak boleh di masa depan melebihi hari ini.";
+            errorContainer.classList.remove('hidden');
+            return;
+          }
+
+          if (periodDuration >= cycleLength) {
+            errorContainer.textContent = "Durasi haid tidak boleh melebihi atau sama dengan panjang siklus.";
+            errorContainer.classList.remove('hidden');
+            return;
+          }
+
+          this.settings = { lmpDate, periodDuration, cycleLength };
+          StorageManager.saveSettings(this.settings);
+          closeModal();
+          this.showToast("Pengaturan siklus berhasil disimpan!");
+          this.renderAll();
+        });
+
+        // Load Demo Data Button
+        document.getElementById('btn-load-demo')?.addEventListener('click', () => {
+          const now = new Date();
+          const demoLmp = new Date();
+          demoLmp.setDate(now.getDate() - 13); // Day 14 = Ovulation peak today!
+
+          this.settings = {
+            lmpDate: CycleCalculator.formatDate(demoLmp),
+            periodDuration: 5,
+            cycleLength: 28
+          };
+          StorageManager.saveSettings(this.settings);
+
+          // Add some demo symptom logs
+          const demoLogDate = CycleCalculator.formatDate(now);
+          this.logs = StorageManager.saveLog(demoLogDate, {
+            flow: 'none',
+            pain: '0',
+            mood: 'happy',
+            symptoms: ['high_energy'],
+            note: 'Merasa sangat berenergi dan ceria hari ini!'
+          });
+
+          closeModal();
+          this.showToast("Data demo siap pakai berhasil dimuat!");
+          this.renderAll();
+        });
+
+        // Reset All Data
+        document.getElementById('btn-reset-all-data')?.addEventListener('click', () => {
+          if (confirm("PERINGATAN: Apakah Anda yakin ingin menghapus seluruh pengaturan dan riwayat catatan gejala?")) {
+            StorageManager.resetAll();
+            this.settings = StorageManager.getSettings();
+            this.logs = {};
+            closeModal();
+            this.showToast("Seluruh data telah di-reset ke kondisi awal.");
+            this.renderAll();
+          }
+        });
+
+        // Calendar Prev / Next / Today
+        document.getElementById('btn-cal-prev')?.addEventListener('click', () => {
+          this.currentViewDate.setMonth(this.currentViewDate.getMonth() - 1);
+          this.renderCalendar();
+        });
+        document.getElementById('btn-cal-next')?.addEventListener('click', () => {
+          this.currentViewDate.setMonth(this.currentViewDate.getMonth() + 1);
+          this.renderCalendar();
+        });
+        document.getElementById('btn-cal-today')?.addEventListener('click', () => {
+          this.currentViewDate = new Date();
+          this.selectedDate = CycleCalculator.formatDate(new Date());
+          this.renderCalendar();
+          this.renderSelectedDateDetail();
+        });
+
+        // Log button on selected date detail card
+        document.getElementById('btn-log-for-selected-date')?.addEventListener('click', () => {
+          this.openLogFormForDate(this.selectedDate);
+        });
+
+        // Daily Log Form Interactive Pickers
+        this.setupDailyLogFormInteractions();
+      }
+
+      setupDailyLogFormInteractions() {
+        // Date input change
+        const dateInput = document.getElementById('input-log-date');
+        dateInput?.addEventListener('change', (e) => {
+          this.loadLogIntoForm(e.target.value);
+        });
+
+        // Flow Buttons
+        const flowButtons = document.querySelectorAll('.flow-pill');
+        flowButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            flowButtons.forEach(b => {
+              b.classList.remove('bg-rose-500', 'text-white', 'border-rose-500');
+              b.classList.add('border-slate-200', 'text-slate-700');
+            });
+            btn.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+            btn.classList.remove('border-slate-200', 'text-slate-700');
+            this.activeFlow = btn.getAttribute('data-flow');
+          });
+        });
+
+        // Pain Level Buttons
+        const painButtons = document.querySelectorAll('.pain-pill');
+        const painLabel = document.getElementById('pain-level-label');
+        const painDescriptions = [
+          '0 - Bebas Nyeri / Normal',
+          '1 - Nyeri Ringan (Masih nyaman)',
+          '2 - Nyeri Sedang (Perlu istirahat sejenak)',
+          '3 - Nyeri Berat (Sangat mengganggu aktivitas)',
+          '4 - Sangat Parah (Butuh kompres/obat)'
+        ];
+
+        painButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            painButtons.forEach(b => {
+              b.classList.remove('bg-amber-500', 'text-white', 'border-amber-500');
+              b.classList.add('border-slate-200');
+            });
+            btn.classList.add('bg-amber-500', 'text-white', 'border-amber-500');
+            btn.classList.remove('border-slate-200');
+            const level = btn.getAttribute('data-pain');
+            this.activePain = level;
+            painLabel.textContent = painDescriptions[parseInt(level, 10)] || level;
+          });
+        });
+
+        // Mood Buttons
+        const moodButtons = document.querySelectorAll('.mood-pill');
+        moodButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            moodButtons.forEach(b => {
+              b.classList.remove('bg-purple-100', 'border-purple-500', 'text-purple-800');
+              b.classList.add('border-slate-200', 'text-slate-700');
+            });
+            btn.classList.add('bg-purple-100', 'border-purple-500', 'text-purple-800');
+            btn.classList.remove('border-slate-200', 'text-slate-700');
+            this.activeMood = btn.getAttribute('data-mood');
+          });
+        });
+
+        // Symptoms Multi-select Tags
+        const symptomTags = document.querySelectorAll('.symptom-tag');
+        symptomTags.forEach(tag => {
+          tag.addEventListener('click', () => {
+            const sym = tag.getAttribute('data-symptom');
+            if (this.activeSymptoms.has(sym)) {
+              this.activeSymptoms.delete(sym);
+              tag.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+              tag.classList.add('border-slate-200', 'text-slate-600');
+            } else {
+              this.activeSymptoms.add(sym);
+              tag.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+              tag.classList.remove('border-slate-200', 'text-slate-600');
+            }
+          });
+        });
+
+        // Form Submit
+        document.getElementById('daily-log-form')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const dateStr = document.getElementById('input-log-date').value;
+          const note = document.getElementById('log-note').value.trim();
+
+          const logData = {
+            flow: this.activeFlow,
+            pain: this.activePain,
+            mood: this.activeMood,
+            symptoms: Array.from(this.activeSymptoms),
+            note
+          };
+
+          this.logs = StorageManager.saveLog(dateStr, logData);
+          this.showToast(`Catatan untuk ${CycleCalculator.formatIndoDate(dateStr, false)} tersimpan!`);
+          this.renderAll();
+        });
+
+        // Delete Log Button
+        document.getElementById('btn-delete-log')?.addEventListener('click', () => {
+          const dateStr = document.getElementById('input-log-date').value;
+          if (confirm(`Hapus catatan tanggal ${CycleCalculator.formatIndoDate(dateStr, false)}?`)) {
+            this.logs = StorageManager.deleteLog(dateStr);
+            this.showToast("Catatan berhasil dihapus.");
+            this.loadLogIntoForm(dateStr);
+            this.renderAll();
+          }
+        });
+      }
+
+      openLogFormForDate(dateStr) {
+        this.switchTab('log');
+        this.loadLogIntoForm(dateStr);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      loadLogIntoForm(dateStr) {
+        const input = document.getElementById('input-log-date');
+        if (input) input.value = dateStr;
+
+        const existing = this.logs[dateStr];
+        const deleteBtn = document.getElementById('btn-delete-log');
+
+        if (existing) {
+          deleteBtn?.classList.remove('hidden');
+          this.activeFlow = existing.flow || 'none';
+          this.activePain = String(existing.pain ?? '0');
+          this.activeMood = existing.mood || 'calm';
+          this.activeSymptoms = new Set(existing.symptoms || []);
+          document.getElementById('log-note').value = existing.note || '';
+        } else {
+          deleteBtn?.classList.add('hidden');
+          this.activeFlow = 'none';
+          this.activePain = '0';
+          this.activeMood = 'calm';
+          this.activeSymptoms = new Set();
+          document.getElementById('log-note').value = '';
+        }
+
+        // Sync UI pills
+        // Flow
+        document.querySelectorAll('.flow-pill').forEach(b => {
+          const match = b.getAttribute('data-flow') === this.activeFlow;
+          b.className = `flow-pill p-2.5 rounded-xl border text-xs font-semibold transition text-center cursor-pointer ${
+            match ? 'bg-rose-500 text-white border-rose-500' : 'border-slate-200 text-slate-700 hover:border-rose-300'
+          }`;
+        });
+
+        // Pain
+        document.querySelectorAll('.pain-pill').forEach(b => {
+          const match = b.getAttribute('data-pain') === this.activePain;
+          b.className = `pain-pill p-2 rounded-xl border text-center text-xs font-semibold transition cursor-pointer ${
+            match ? 'bg-amber-500 text-white border-amber-500' : 'border-slate-200 hover:border-rose-300'
+          }`;
+        });
+        const painLabel = document.getElementById('pain-level-label');
+        if (painLabel) {
+          painLabel.textContent = `Tingkat ${this.activePain}`;
+        }
+
+        // Mood
+        document.querySelectorAll('.mood-pill').forEach(b => {
+          const match = b.getAttribute('data-mood') === this.activeMood;
+          b.className = `mood-pill p-2.5 rounded-xl border text-xs font-medium transition flex flex-col items-center gap-1 cursor-pointer ${
+            match ? 'bg-purple-100 border-purple-500 text-purple-800' : 'border-slate-200 text-slate-700 hover:border-rose-300'
+          }`;
+        });
+
+        // Symptoms
+        document.querySelectorAll('.symptom-tag').forEach(tag => {
+          const sym = tag.getAttribute('data-symptom');
+          const isSelected = this.activeSymptoms.has(sym);
+          tag.className = `symptom-tag px-3 py-1.5 rounded-full border text-xs font-medium transition cursor-pointer ${
+            isSelected ? 'bg-emerald-500 text-white border-emerald-500' : 'border-slate-200 text-slate-600 hover:border-rose-300'
+          }`;
+        });
+      }
+
+      switchTab(tabId) {
+        document.querySelectorAll('.tab-section').forEach(sec => {
+          sec.classList.add('hidden');
+        });
+        const target = document.getElementById(`tab-${tabId}`);
+        if (target) target.classList.remove('hidden');
+
+        // Update active tab buttons
+        document.querySelectorAll('.tab-btn, .mobile-nav-btn').forEach(btn => {
+          if (btn.getAttribute('data-tab') === tabId) {
+            btn.classList.add('active-tab');
+            if (btn.classList.contains('tab-btn')) {
+              btn.classList.add('bg-rose-500', 'text-white', 'shadow-xs');
+              btn.classList.remove('text-slate-600');
+            } else {
+              btn.classList.add('text-rose-600');
+              btn.classList.remove('text-slate-400');
+            }
+          } else {
+            btn.classList.remove('active-tab');
+            if (btn.classList.contains('tab-btn')) {
+              btn.classList.remove('bg-rose-500', 'text-white', 'shadow-xs');
+              btn.classList.add('text-slate-600');
+            } else {
+              btn.classList.remove('text-rose-600');
+              btn.classList.add('text-slate-400');
+            }
+          }
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      updateSettingsFormValues() {
+        const lmpInput = document.getElementById('input-lmp-date');
+        const periodSlider = document.getElementById('input-period-duration');
+        const cycleSlider = document.getElementById('input-cycle-length');
+
+        if (lmpInput) lmpInput.value = this.settings.lmpDate || '';
+        if (periodSlider) {
+          periodSlider.value = this.settings.periodDuration || 5;
+          document.getElementById('display-period-duration').textContent = `${this.settings.periodDuration} Hari`;
+        }
+        if (cycleSlider) {
+          cycleSlider.value = this.settings.cycleLength || 28;
+          document.getElementById('display-cycle-length').textContent = `${this.settings.cycleLength} Hari`;
+        }
+      }
+
+      // --- RENDERING DASHBOARD ---
+      renderDashboard() {
+        const today = new Date();
+        const evalToday = CycleCalculator.evaluateDate(today, this.cycleData);
+
+        // Progress Ring Calculation
+        // Circumference of radius 70 = 2 * PI * 70 ≈ 439.82
+        const circumference = 440;
+        const cycleLength = this.cycleData.cycleLength;
+        const currentDay = Math.min(Math.max(evalToday.cycleDay, 1), cycleLength);
+        const progressRatio = currentDay / cycleLength;
+        const offset = circumference - (circumference * progressRatio);
+
+        const circle = document.getElementById('cycle-progress-circle');
+        if (circle) {
+          circle.style.strokeDashoffset = offset;
+          // Color based on phase
+          if (evalToday.phase === 'menstruation') circle.style.stroke = '#f43f5e';
+          else if (evalToday.phase === 'fertile' || evalToday.phase === 'ovulation') circle.style.stroke = '#10b981';
+          else circle.style.stroke = '#8b5cf6';
+        }
+
+        // Center Countdown
+        const dayBadge = document.getElementById('cycle-day-badge');
+        const countdownNumber = document.getElementById('countdown-number');
+        const countdownLabel = document.getElementById('countdown-label');
+
+        if (evalToday.isPeriod) {
+          dayBadge.textContent = `Haid Hari ke-${evalToday.cycleDay}`;
+          dayBadge.className = 'text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full mb-1';
+          countdownNumber.textContent = `${evalToday.cycleDay}/${this.cycleData.periodDuration}`;
+          countdownLabel.textContent = 'Hari Haid Berlangsung';
+        } else if (evalToday.isOverdue) {
+          const overdueDays = Math.abs(evalToday.diffDaysToNext);
+          dayBadge.textContent = `Hari ke-${evalToday.cycleDay}`;
+          dayBadge.className = 'text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full mb-1';
+          countdownNumber.textContent = `+${overdueDays}`;
+          countdownLabel.textContent = 'Hari Terlambat';
+        } else {
+          dayBadge.textContent = `Hari ke-${evalToday.cycleDay} Siklus`;
+          dayBadge.className = 'text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-100/90 px-2.5 py-0.5 rounded-full mb-1';
+          countdownNumber.textContent = evalToday.diffDaysToNext;
+          countdownLabel.textContent = 'Hari Menuju Haid Berikutnya';
+        }
+
+        // Hero Greeting & Phase Pill
+        const phaseTitle = document.getElementById('phase-title');
+        const phasePill = document.getElementById('phase-pill');
+        const heroGreeting = document.getElementById('hero-greeting');
+        const phaseDesc = document.getElementById('phase-description');
+
+        phaseTitle.textContent = evalToday.phaseName;
+        phaseDesc.textContent = evalToday.phaseDescription;
+
+        if (evalToday.phase === 'menstruation') {
+          phasePill.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700';
+          heroGreeting.textContent = 'Tubuhmu sedang dalam fase istirahat.';
+        } else if (evalToday.phase === 'ovulation') {
+          phasePill.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700';
+          heroGreeting.textContent = 'Puncak ovulasi: Kesuburan berada di titik tertinggi.';
+        } else if (evalToday.phase === 'fertile') {
+          phasePill.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700';
+          heroGreeting.textContent = 'Kamu berada di jendela masa subur.';
+        } else {
+          phasePill.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700';
+          heroGreeting.textContent = 'Keseimbangan hormon sedang berlangsung.';
+        }
+
+        // Key stats
+        document.getElementById('stat-next-period').textContent = CycleCalculator.formatIndoDate(this.cycleData.nextPeriod, false);
+        document.getElementById('stat-ovulation').textContent = CycleCalculator.formatIndoDate(this.cycleData.ovulation, false);
+        document.getElementById('stat-fertile-window').textContent = `${this.cycleData.fertileStart.getDate()} - ${CycleCalculator.formatIndoDate(this.cycleData.fertileEnd, false)}`;
+
+        // Fertility Card
+        const fertilityBadge = document.getElementById('fertility-chance-badge');
+        const fertilityDesc = document.getElementById('fertility-chance-desc');
+        const fertilityIcon = document.getElementById('fertility-icon-container');
+
+        fertilityBadge.textContent = evalToday.pregnancyChance;
+        if (evalToday.phase === 'ovulation' || evalToday.phase === 'fertile') {
+          fertilityBadge.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+          fertilityIcon.className = 'w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0';
+          fertilityDesc.textContent = 'Peluang sperma membuahi sel telur sangat terbuka. Jika berencana memiliki momongan, ini saat terbaik!';
+        } else {
+          fertilityBadge.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600';
+          fertilityIcon.className = 'w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0';
+          fertilityDesc.textContent = 'Kamu berada di luar jendela masa subur. Peluang konsepsi alami saat ini relatif rendah.';
+        }
+
+        // Nutrition tip according to phase
+        const nutritionTip = document.getElementById('nutrition-tip');
+        if (evalToday.phase === 'menstruation') {
+          nutritionTip.textContent = 'Perbanyak asupan zat besi (daging merah, bayam, kurma), teh herbal chamomile, serta air hangat.';
+        } else if (evalToday.phase === 'follicular') {
+          nutritionTip.textContent = 'Konsumsi makanan kaya protein, sayuran segar, dan karbohidrat kompleks untuk mendukung peningkatan energimu.';
+        } else if (evalToday.phase === 'fertile' || evalToday.phase === 'ovulation') {
+          nutritionTip.textContent = 'Makanan kaya antioksidan (beri, alpukat, kacang almond) sangat bagus untuk kualitas sel telur dan daya tahan tubuh.';
+        } else {
+          nutritionTip.textContent = 'Konsumsi makanan ber-magnesium (pisang, cokelat hitam) dan batasi asupan garam untuk meminimalkan kembung dan kram pra-haid.';
+        }
+
+        // Mini 7-day strip
+        this.renderMiniCalendarStrip();
+      }
+
+      renderMiniCalendarStrip() {
+        const container = document.getElementById('mini-calendar-strip');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const today = new Date();
+        // Show 7 days around today: 3 days before, today, 3 days after
+        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+        for (let i = -3; i <= 3; i++) {
+          const d = new Date(today);
+          d.setDate(today.getDate() + i);
+          const dateStr = CycleCalculator.formatDate(d);
+          const evalD = CycleCalculator.evaluateDate(d, this.cycleData);
+          const isToday = i === 0;
+
+          const col = document.createElement('div');
+          col.className = `p-2 rounded-2xl transition cursor-pointer flex flex-col items-center justify-center text-center ${
+            isToday ? 'ring-2 ring-rose-500 bg-rose-50' : 'bg-slate-50 hover:bg-slate-100'
+          }`;
+
+          col.addEventListener('click', () => {
+            this.selectedDate = dateStr;
+            this.switchTab('calendar');
+            this.currentViewDate = new Date(d);
+            this.renderCalendar();
+            this.renderSelectedDateDetail();
+          });
+
+          let indicatorColor = 'bg-slate-200';
+          if (evalD.isPeriod) indicatorColor = 'bg-rose-500';
+          else if (evalD.isOvulationDay) indicatorColor = 'bg-purple-500';
+          else if (evalD.isFertile) indicatorColor = 'bg-emerald-400';
+          else if (evalD.isPredictedNextPeriod) indicatorColor = 'bg-rose-300';
+
+          col.innerHTML = `
+            <span class="text-[10px] font-semibold text-slate-400 uppercase">${days[d.getDay()]}</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-800 my-0.5">${d.getDate()}</span>
+            <span class="w-1.5 h-1.5 rounded-full ${indicatorColor}"></span>
+          `;
+          container.appendChild(col);
+        }
+      }
+
+      // --- RENDERING CALENDAR ---
+      renderCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        const monthYearLabel = document.getElementById('calendar-month-year');
+        if (!grid || !monthYearLabel) return;
+
+        grid.innerHTML = '';
+
+        const year = this.currentViewDate.getFullYear();
+        const month = this.currentViewDate.getMonth();
+
+        const monthNames = [
+          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+        monthYearLabel.textContent = `${monthNames[month]} ${year}`;
+
+        // First day of month (0 = Sun, 1 = Mon...)
+        const firstDay = new Date(year, month, 1).getDay();
+        // Number of days in month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        // Number of days in previous month
+        const prevMonthDays = new Date(year, month, 0).getDate();
+
+        // 1. Previous month blank/padding days
+        for (let p = firstDay - 1; p >= 0; p--) {
+          const dayNum = prevMonthDays - p;
+          const prevDate = new Date(year, month - 1, dayNum);
+          const dateStr = CycleCalculator.formatDate(prevDate);
+          grid.appendChild(this.createCalendarDayCell(prevDate, dateStr, true));
+        }
+
+        // 2. Current month days
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateObj = new Date(year, month, day);
+          const dateStr = CycleCalculator.formatDate(dateObj);
+          grid.appendChild(this.createCalendarDayCell(dateObj, dateStr, false));
+        }
+
+        // 3. Next month filler days (fill up to multiple of 7)
+        const totalRendered = firstDay + daysInMonth;
+        const nextDays = (7 - (totalRendered % 7)) % 7;
+        for (let n = 1; n <= nextDays; n++) {
+          const nextDate = new Date(year, month + 1, n);
+          const dateStr = CycleCalculator.formatDate(nextDate);
+          grid.appendChild(this.createCalendarDayCell(nextDate, dateStr, true));
+        }
+      }
+
+      createCalendarDayCell(dateObj, dateStr, isOtherMonth) {
+        const cell = document.createElement('div');
+        const evalD = CycleCalculator.evaluateDate(dateObj, this.cycleData);
+        const todayStr = CycleCalculator.formatDate(new Date());
+        const isToday = dateStr === todayStr;
+        const isSelected = dateStr === this.selectedDate;
+        const hasLog = Boolean(this.logs[dateStr]);
+
+        cell.className = `min-h-[58px] sm:min-h-[70px] p-1.5 rounded-2xl flex flex-col items-center justify-between transition cursor-pointer relative border ${
+          isOtherMonth ? 'opacity-35 border-transparent' : 'border-slate-100 hover:border-rose-200'
+        }`;
+
+        // Styling based on cycle events
+        if (evalD.isPeriod) {
+          cell.classList.add('bg-rose-50', 'text-rose-900', 'font-semibold');
+        } else if (evalD.isPredictedNextPeriod) {
+          cell.classList.add('bg-rose-50/50', 'text-rose-800');
+        } else if (evalD.isOvulationDay) {
+          cell.classList.add('bg-purple-50', 'text-purple-900', 'font-semibold');
+        } else if (evalD.isFertile) {
+          cell.classList.add('bg-emerald-50/70', 'text-emerald-900');
+        } else {
+          cell.classList.add('bg-white');
+        }
+
+        if (isToday) {
+          cell.classList.add('ring-2', 'ring-rose-500');
+        }
+        if (isSelected) {
+          cell.classList.add('shadow-md', 'scale-98', 'border-rose-400');
+        }
+
+        // Content
+        let badgeHtml = '';
+        if (evalD.isPeriod) {
+          badgeHtml = `<span class="w-2 h-2 rounded-full bg-rose-500 shadow-xs" title="Haid"></span>`;
+        } else if (evalD.isOvulationDay) {
+          badgeHtml = `<span class="w-2 h-2 rounded-full bg-purple-500 shadow-xs" title="Puncak Ovulasi"></span>`;
+        } else if (evalD.isFertile) {
+          badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Masa Subur"></span>`;
+        } else if (evalD.isPredictedNextPeriod) {
+          badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-rose-300" title="Prediksi Haid"></span>`;
+        }
+
+        let logIndicator = '';
+        if (hasLog) {
+          logIndicator = `<span class="w-1 h-1 rounded-full bg-slate-800" title="Ada Catatan Gejala"></span>`;
+        }
+
+        cell.innerHTML = `
+          <div class="w-full flex items-center justify-between text-[11px] sm:text-xs">
+            <span class="font-bold ${isToday ? 'text-rose-600' : ''}">${dateObj.getDate()}</span>
+            ${logIndicator}
+          </div>
+          <div class="mt-auto mb-1 flex items-center gap-1">
+            ${badgeHtml}
+          </div>
+        `;
+
+        cell.addEventListener('click', () => {
+          this.selectedDate = dateStr;
+          this.renderCalendar();
+          this.renderSelectedDateDetail();
+        });
+
+        return cell;
+      }
+
+      renderSelectedDateDetail() {
+        const title = document.getElementById('selected-date-title');
+        const container = document.getElementById('selected-date-details');
+        const logBtnText = document.getElementById('selected-date-log-btn-text');
+        if (!title || !container) return;
+
+        const dateObj = CycleCalculator.parseDate(this.selectedDate);
+        title.textContent = CycleCalculator.formatIndoDate(dateObj);
+
+        const evalD = CycleCalculator.evaluateDate(dateObj, this.cycleData);
+        const log = this.logs[this.selectedDate];
+
+        logBtnText.textContent = log ? 'Edit Catatan Tanggal Ini' : 'Catat Gejala Tanggal Ini';
+
+        // Phase badge details
+        let phaseColor = 'bg-slate-100 text-slate-700';
+        if (evalD.phase === 'menstruation') phaseColor = 'bg-rose-100 text-rose-700';
+        else if (evalD.phase === 'ovulation') phaseColor = 'bg-purple-100 text-purple-700';
+        else if (evalD.phase === 'fertile') phaseColor = 'bg-emerald-100 text-emerald-700';
+
+        let html = `
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-400">Status Siklus</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full ${phaseColor}">${evalD.phaseName}</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">${evalD.phaseDescription}</p>
+            <div class="pt-1 flex items-center gap-4 text-xs font-medium text-slate-500">
+              <span>Hari ke-${evalD.cycleDay} siklus</span>
+              <span>•</span>
+              <span>Peluang Kehamilan: <strong class="text-slate-800">${evalD.pregnancyChance}</strong></span>
+            </div>
+          </div>
+        `;
+
+        // Daily Log section
+        if (log) {
+          const painEmojis = ['😊 Bebas Nyeri', '🙂 Ringan', '😐 Sedang', '😣 Berat', '😫 Sangat Berat'];
+          const moodLabels = {
+            happy: '😊 Senang',
+            calm: '😌 Tenang',
+            sensitive: '🥺 Sensitif',
+            anxious: '😰 Cemas',
+            tired: '🥱 Lelah',
+            irritated: '😠 Mudah Kesal'
+          };
+          const flowLabels = {
+            none: 'Tidak Ada',
+            spotting: 'Bercak (Spotting)',
+            light: 'Ringan',
+            medium: 'Sedang',
+            heavy: 'Deras'
+          };
+
+          const symptomsList = (log.symptoms && log.symptoms.length > 0)
+            ? log.symptoms.map(s => `<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-semibold">${s}</span>`).join(' ')
+            : '<span class="text-slate-400 text-xs">Tidak ada gejala tambahan</span>';
+
+          html += `
+            <div class="p-4 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-rose-900">Catatan Tubuh Tersimpan</span>
+                <span class="text-[11px] text-slate-400">Tercatat</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div><span class="text-slate-400">Aliran:</span> <strong class="text-slate-800">${flowLabels[log.flow] || log.flow}</strong></div>
+                <div><span class="text-slate-400">Nyeri:</span> <strong class="text-slate-800">${painEmojis[parseInt(log.pain, 10)] || log.pain}</strong></div>
+                <div><span class="text-slate-400">Mood:</span> <strong class="text-slate-800">${moodLabels[log.mood] || log.mood}</strong></div>
+              </div>
+              <div class="pt-1">
+                <span class="text-[11px] text-slate-400 block mb-1">Gejala Fisik:</span>
+                <div class="flex flex-wrap gap-1">${symptomsList}</div>
+              </div>
+              ${log.note ? `<p class="mt-2 text-xs text-slate-700 italic bg-white p-2 rounded-xl border border-rose-100">"${log.note}"</p>` : ''}
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="p-4 rounded-2xl bg-white border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-2">
+              <span class="text-slate-400 text-xs">Belum ada catatan gejala untuk tanggal ini.</span>
+              <button onclick="window.appUI.openLogFormForDate('${this.selectedDate}')" class="text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer">
+                + Tambah Catatan Sekarang
+              </button>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+      }
+
+      // --- RENDERING LOGS LIST ---
+      renderRecentLogs() {
+        const container = document.getElementById('dashboard-recent-logs');
+        if (!container) return;
+
+        const dates = Object.keys(this.logs).sort().reverse();
+        if (dates.length === 0) {
+          container.innerHTML = `
+            <div class="p-4 rounded-2xl bg-slate-50 text-center text-xs text-slate-400">
+              Belum ada catatan gejala. Klik tombol di atas untuk mencatat kondisi tubuhmu hari ini!
+            </div>
+          `;
+          return;
+        }
+
+        const recent = dates.slice(0, 3);
+        container.innerHTML = recent.map(dateStr => {
+          const item = this.logs[dateStr];
+          return `
+            <div onclick="window.appUI.openLogFormForDate('${dateStr}')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-rose-50/60 border border-slate-100 transition flex items-center justify-between cursor-pointer">
+              <div class="space-y-0.5">
+                <span class="text-xs font-bold text-slate-800">${CycleCalculator.formatIndoDate(dateStr, true)}</span>
+                <p class="text-[11px] text-slate-500">
+                  Mood: <strong>${item.mood || '-'}</strong> • Nyeri: <strong>${item.pain}/4</strong> • Aliran: <strong>${item.flow || '-'}</strong>
+                </p>
+              </div>
+              <span class="text-xs font-semibold text-rose-600 hover:underline">Lihat &raquo;</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderLogHistory() {
+        const container = document.getElementById('full-log-history');
+        if (!container) return;
+
+        const dates = Object.keys(this.logs).sort().reverse();
+        if (dates.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 rounded-2xl bg-slate-50 text-center text-xs text-slate-400">
+              Riwayat masih kosong. Mulai rekam kondisi kesehatanmu melalui form di atas.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = dates.map(dateStr => {
+          const item = this.logs[dateStr];
+          return `
+            <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-2">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold text-slate-900">${CycleCalculator.formatIndoDate(dateStr, true)}</h4>
+                <div class="flex items-center gap-2">
+                  <button onclick="window.appUI.openLogFormForDate('${dateStr}')" class="text-xs font-semibold text-rose-600 hover:underline cursor-pointer">Edit</button>
+                  <span class="text-slate-300">•</span>
+                  <button onclick="window.appUI.confirmDeleteLog('${dateStr}')" class="text-xs font-semibold text-slate-400 hover:text-rose-600 cursor-pointer">Hapus</button>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2 text-xs text-slate-600">
+                <span class="px-2.5 py-1 rounded-xl bg-slate-100">Aliran: <strong>${item.flow}</strong></span>
+                <span class="px-2.5 py-1 rounded-xl bg-slate-100">Kram: <strong>${item.pain}/4</strong></span>
+                <span class="px-2.5 py-1 rounded-xl bg-slate-100">Mood: <strong>${item.mood}</strong></span>
+              </div>
+              ${item.note ? `<p class="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">"${item.note}"</p>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      confirmDeleteLog(dateStr) {
+        if (confirm(`Hapus catatan pada ${CycleCalculator.formatIndoDate(dateStr, false)}?`)) {
+          this.logs = StorageManager.deleteLog(dateStr);
+          this.showToast("Catatan dihapus.");
+          this.renderAll();
+        }
+      }
+
+      showToast(message) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-message');
+        if (!toast || !toastMsg) return;
+
+        toastMsg.textContent = message;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        setTimeout(() => {
+          toast.classList.remove('translate-y-0', 'opacity-100');
+          toast.classList.add('translate-y-20', 'opacity-0');
+        }, 3000);
+      }
+    }
+
+    // Initialize application when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.appUI = new AppUI();
+    });
+  </script>
+</body>
+</html>

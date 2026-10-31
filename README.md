@@ -9,7 +9,7 @@
 - **Live Demo / Deploy**: Integrated static deployment (GitHub Pages / Vercel)
 - **Teknologi**: HTML5, Tailwind CSS (via CDN), Vanilla JavaScript (ES6+)
 - **Model Data**: Offline-first via Browser `localStorage`
-- **Link Akses** -> https://siklusku-two.vercel.app/
+- **Link Akses**: https://siklusku-two.vercel.app/
 ---
 
 ## ✨ Fitur Utama
